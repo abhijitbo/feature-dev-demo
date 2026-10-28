@@ -38,6 +38,78 @@ Before any Jira / Confluence MCP call, resolve the Atlassian `cloudId` dynamical
 
 ---
 
+## Model Routing — Run Each Step on Its Configured Model
+
+When `agent.model_routing.enabled` is `true` and `agent.model_routing.mode` is `"enforced"`, you are the
+**orchestrator**. Do not perform the steps yourself. Run each step group below as a subagent with
+the Agent tool (`subagent_type: "general-purpose"`), passing that group's model in the Agent tool's `model`
+parameter. The orchestrator itself only reads config, dispatches subagents, carries results between
+them, applies the escalation rule and prints the output. Its own turns run on the session model; start
+the session with `/model sonnet` so orchestration runs on the `default_tier`.
+
+When `mode` is `"advisory"`, run every step yourself in this session, but announce the recommended model
+before each step group and still record the Model Usage Log, marking every row `advisory — not switched`.
+
+### Resolve a tier to a model
+1. Tier for a step = `agent.model_routing.steps[<config key>]`. A key such as `"1,1a,1.5"` covers each listed step.
+   Missing key → `default_tier`.
+2. Escalation (plan gate and Step 5 only): use `premium` if `force_tier` is set to `premium`, or if any rule in
+   `escalate_to_premium_when` holds, judged from the Step 3.5 result: complexity is L or XL, SQL / `.sqlproj`
+   files are in scope, or the story matches a listed signal.
+3. Model = `tiers.<tier>.claude`. Pass the family alias as the Agent `model` parameter: a name containing
+   `Haiku` → `haiku`, `Sonnet` → `sonnet`, `Opus` → `opus`. Never dispatch a model listed in `avoid_models`.
+   The Agent tool only runs Claude models, so the `openai` entries are not used here.
+4. If the Agent tool is unavailable, tell the user to run `/model <single_model_fallback model>`, run the
+   steps in this session, and mark every log row `fallback — single model`.
+
+### Step groups
+Consecutive steps with the same tier share one subagent, so context is handed over as few times as possible.
+
+| # | Steps | Config key(s) | Tier | Subagent returns |
+|---|---|---|---|---|
+| G1 | Prerequisites P1–P7, Language Detection, Step 1, Step 2 | `P0-P10`, `0`, `1,1a,1.5`, `2,2.5` | cheap | Prerequisite results, language and build tool, story fields, full AC list, Confluence summary |
+| G2 | Step 3 (explore) and Step 3.5 (complexity) | `3`, `3.5` | mid | Conventions, relevant files, complexity size, SQL in scope (yes/no), matched signals |
+| G3 | Step 5a (plan) | `plan_gate` | mid → premium if escalated | File-by-file plan mapped to ACs |
+| G4 | Step 4 (create branch) | `4` | cheap | Branch name |
+| G5 | Step 5b–5c (implement) | `5` | mid → premium if escalated | Files changed, AC matrix with file:line |
+| G6 | Step 6 (unit tests), Step 7 (build, test, fix) and the SQL scan if SQL is in scope | `6`, `7`, `7_sql_scan` | mid | Test files, pass/fail counts, test-summary path, SAST result |
+| G7 | Step 8 (commit) and Step 9 (push) | `8`, `9` | cheap | Commit hash(es), push result |
+| G8 | Step 9.5 (code review gate), only if `agent.review_before_pr` is `true` | `9.5` | mid | Findings by severity, fixes committed and pushed |
+| G9 | Step 10, PR body only | `10_pr_body` | mid | PR body file path |
+| G10 | Step 10, PR create; Step 11; Step 12 | `10_pr_create`, `11`, `12` | cheap | PR URL, Jira result, report paths, commit hash |
+| G11 | Step 13 (final summary) | `13` | cheap | Final summary table as Markdown |
+
+`10a` (Azure DevOps AB# title check) does not apply to Jira and is skipped.
+
+### Subagent prompt contract
+A subagent knows only what its prompt says. Every prompt must contain:
+- The story key, the repository path, and the config values the steps need.
+- An instruction to read `.claude/commands/feature-dev.md` and execute **only** the named steps, exactly as written.
+- All outputs from earlier groups that these steps need: the AC list, conventions, plan, branch name,
+  changed files and test results. Pass them verbatim; don't summarize ACs.
+- An instruction to stop and report rather than guess when a step's Fail Action says Stop or confirm with the user.
+- The exact structure to return (the "Subagent returns" column), plus `status: ok | stopped | failed` and a reason.
+
+When a subagent returns `stopped` or `failed`, do not dispatch later groups. Report the outcome to the user,
+and relay any question that needs a decision from them.
+
+### Model Usage Log
+Keep one row per dispatch, in order. That includes retries and Step 9.5 fix rounds.
+
+```
+MODEL USAGE LOG — <STORY-KEY>
+───────────────────────────────────────────────────────────────────────────
+Group  Steps            Tier     Model              Escalated  Status
+───────────────────────────────────────────────────────────────────────────
+—      orchestrator     session  <session model>    —          —
+G1     P1–P7, 0, 1, 2   cheap    Claude Haiku 5.5   no         ok
+...
+───────────────────────────────────────────────────────────────────────────
+```
+Pass the log to G10 for the Step 12 report and to G11 for the final summary. Print it to the user at the end.
+
+---
+
 ## Prerequisites
 Verify all conditions before writing any code. Stop if a critical check fails.
 
@@ -169,6 +241,25 @@ Record in working memory for this session:
 - Naming patterns (e.g. `*Service`, `*Repository`, `*Controller`, `*Test`)
 - Any utility classes relevant to this story
 - Security or logging patterns to follow
+
+---
+
+### Step 3.5 — Rate Complexity
+
+Rate the story's size from the ACs and the Step 3 findings. The result decides model escalation (see Model Routing).
+
+| Size | Guide |
+|---|---|
+| S | 1–2 files, one method or rule, no new types |
+| M | 3–5 files, new types or a changed public signature, single module |
+| L | 6+ files, several modules or layers, or a data-model change used widely |
+| XL | Cross-service or architectural change, new integration, or a migration |
+
+Also record:
+- **SQL in scope:** yes if the change touches `.sql` or `.sqlproj` files, or schema/migration files.
+- **Signals:** which of `agent.model_routing.escalate_to_premium_when.signals` the story matches (e.g. FHIR, EDI).
+
+Print: `Complexity: <size> · SQL in scope: <yes/no> · Signals: <list or none> · Escalate: <yes/no>`.
 
 ---
 
@@ -414,6 +505,26 @@ git push --set-upstream origin feature/<branch-name>
 
 ---
 
+### Step 9.5 — Code Review Gate (only if `agent.review_before_pr` is `true`)
+
+Review the full branch diff before the PR is raised:
+```bash
+git diff <github.base_branch>...HEAD
+```
+
+Check for:
+- Correctness bugs and unhandled edge cases against each AC.
+- Security issues: injection, secrets, unsafe deserialization, missing input validation.
+- Breaking changes to existing public signatures or behavior.
+- Missing tests for an AC's happy path, edge case or negative path.
+
+Rate each finding Critical / High / Medium / Low.
+- **Critical / High:** fix it, re-run Step 7, then commit `fix(<STORY-KEY>): address pre-PR review findings` and push.
+  Allow at most `agent.max_build_fix_iterations` rounds; if findings remain after that, stop and report them.
+- **Medium / Low:** don't fix; list them under "Reviewer notes" in the PR body.
+
+---
+
 ### Step 10 — Raise the Pull Request
 
 Verify GitHub CLI:
@@ -587,6 +698,13 @@ Save to `reports/pr_reports/PR-<STORY-KEY>.md`:
 - Comment added: Yes
 - Status transitioned to: <new status>
 
+## Model Usage
+| Group | Steps | Tier | Model | Escalated | Status |
+|---|---|---|---|---|---|
+| — | orchestrator | session | <session model> | — | — |
+| G1 | P1–P7, 0, 1, 2 | cheap | <model> | no | ok |
+<one row per dispatch from the Model Usage Log>
+
 ## Next Step
 Run `pr-review` skill with `<STORY-KEY>` for structured code review before merging.
 ```
@@ -594,7 +712,7 @@ Run `pr-review` skill with `<STORY-KEY>` for structured code review before mergi
 Also generate an **HTML version** of this report at `reports/pr_reports/PR-<STORY-KEY>.html`:
 - Use Bootstrap 5 CDN
 - Professional sectioned layout with status badges (✅ Implemented, ✅ Passed, ⚠️ Skipped)
-- Include: Story header, AC traceability table, implementation table, test results, SAST result
+- Include: Story header, AC traceability table, implementation table, test results, SAST result, model usage table
 - Standalone — no build steps required to view
 
 Commit both report files:
@@ -626,7 +744,11 @@ Print a final summary table:
 | Jira Status | Transitioned to `<status>` |
 | Report (MD) | `reports/pr_reports/PR-<STORY-KEY>.md` |
 | Report (HTML) | `reports/pr_reports/PR-<STORY-KEY>.html` |
+| Complexity | <size> · escalated: <yes/no> |
+| Models Used | <e.g. Haiku 5.5 ×4 groups, Sonnet 5.5 ×5 groups, Opus 5.5 ×0> |
 | Next Step | Run `pr-review` skill with `<STORY-KEY>` |
+
+Then print the Model Usage Log.
 
 ---
 
@@ -671,3 +793,4 @@ This skill is considered successfully completed when:
 - [ ] Jira story updated with PR link and status transitioned.
 - [ ] PR summary report (MD + HTML) saved and committed.
 - [ ] Final summary table printed.
+- [ ] With routing enforced: every step group ran as a subagent on its configured model, and the Model Usage Log is in the report and printed.

@@ -12,13 +12,6 @@ jira:
 confluence:
   space: DEMO
 
-# ── Azure DevOps (not used by this demo — work is tracked in Jira) ──
-# azure_devops:
-#   org_url: "https://dev.azure.com/prohcn/"   # used VERBATIM (dev.azure.com or <org>.visualstudio.com are aliases)
-#   project: "Crew"                            # CASE-SENSITIVE — exact ADO-URL casing, or the project GUID
-#   wiki: "Crew.wiki"
-#   review_state: "Code Review"                # state after PR; empty/absent = comment only, state unchanged
-#   token_env: AZURE_DEVOPS_TOKEN
 
 # ── Source control ─────────────────────────────────────────────
 github:
@@ -51,14 +44,16 @@ agent:
   timing_report_dir: ".ai/reports/timing"
 
   # ------------------------------------------------------------------------
-  # Model Routing (v9.9) — Claude primary, OpenAI fallback; ADVISORY.
-  # The skill ANNOUNCES the recommended tier+model per step; the host picker
-  # selects the active model. Escalation policy = Option 2 (L + XL + SQL + signals).
+  # Model Routing (v9.9) — Claude primary, OpenAI fallback.
+  # enforced: each step group runs as a subagent on its tier's Claude model
+  #           (see "Model Routing" in .claude/commands/feature-dev.md).
+  # advisory: one model runs everything; the recommended model is only announced.
+  # Escalation policy = Option 2 (L + XL + SQL + signals).
   # Never bind a ⚠️ (deprecation-planned) model — see avoid_models.
   # ------------------------------------------------------------------------
   model_routing:
     enabled: true
-    mode: "advisory"
+    mode: "enforced"                    # enforced | advisory
     default_vendor: "claude"            # claude primary; openai fallback
     default_tier: "mid"
 
