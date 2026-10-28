@@ -1,5 +1,6 @@
 package com.demo.orders.service;
 
+import com.demo.orders.discount.DiscountPolicy;
 import com.demo.orders.discount.TieredDiscountPolicy;
 import com.demo.orders.exception.OrderNotFoundException;
 import com.demo.orders.model.CheckoutSummary;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -56,6 +58,14 @@ import static org.mockito.Mockito.when;
  * - AC-03: cancelling an already CANCELLED order → IllegalStateException, not saved again
  * - AC-04: unknown order id → OrderNotFoundException
  * - AC-05: null order id, null/blank reason or reason over 255 characters → IllegalArgumentException
+ *
+ * <p>Checkout-status tests cover Jira story DEMO-97:
+ * Block checkout of a cancelled order.</p>
+ *
+ * Acceptance criteria tested:
+ * - AC-01: checkout of a CANCELLED order → IllegalStateException naming the order id and status CANCELLED
+ * - AC-02: checkout of a CANCELLED order → DiscountPolicy is never called
+ * - AC-03: checkout of a PLACED order → result unchanged from DEMO-95
  */
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -350,5 +360,49 @@ class OrderServiceTest {
 
         assertThrows(OrderNotFoundException.class,
                 () -> orderService.checkout("ORD-404", customer(CustomerTier.GOLD)));
+    }
+
+    // DEMO-97 AC-01
+
+    @Test
+    void checkout_whenOrderIsCancelled_throwsIllegalStateException() {
+        Order cancelled = orderWith(new OrderItem("P-1", BigDecimal.ONE, 1)).cancel("first", NOW);
+        when(orderRepository.findById("ORD-1")).thenReturn(Optional.of(cancelled));
+
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> orderService.checkout("ORD-1", customer(CustomerTier.STANDARD)));
+        assertTrue(e.getMessage().contains("ORD-1"));
+        assertTrue(e.getMessage().contains("CANCELLED"));
+    }
+
+    @Test
+    void checkout_whenCancelledOrderHasNoItems_throwsIllegalStateException() {
+        // status check runs before the empty-items check
+        Order cancelled = orderWith().cancel("first", NOW);
+        when(orderRepository.findById("ORD-1")).thenReturn(Optional.of(cancelled));
+
+        assertThrows(IllegalStateException.class,
+                () -> orderService.checkout("ORD-1", customer(CustomerTier.STANDARD)));
+    }
+
+    // DEMO-97 AC-02
+
+    @Test
+    void checkout_whenOrderIsCancelled_doesNotCallDiscountPolicy() {
+        DiscountPolicy discountPolicy = mock(DiscountPolicy.class);
+        OrderService service = new OrderService(orderRepository, discountPolicy, Clock.fixed(NOW, ZoneOffset.UTC));
+        Order cancelled = orderWith(new OrderItem("P-1", BigDecimal.ONE, 1)).cancel("first", NOW);
+        when(orderRepository.findById("ORD-1")).thenReturn(Optional.of(cancelled));
+
+        assertThrows(IllegalStateException.class,
+                () -> service.checkout("ORD-1", customer(CustomerTier.STANDARD)));
+        verifyNoInteractions(discountPolicy);
+    }
+
+    // DEMO-97 AC-03
+
+    @Test
+    void checkout_whenOrderIsPlaced_appliesDiscountAsBefore() {
+        assertSummary(checkoutSingleItem("100.00", CustomerTier.SILVER), "100.00", "7.00", "7.00", "93.00");
     }
 }

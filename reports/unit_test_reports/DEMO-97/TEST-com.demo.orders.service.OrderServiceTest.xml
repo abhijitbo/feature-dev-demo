@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.demo.orders.service.OrderServiceTest" time="2.917" tests="37" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="E:\Azure Workspace\feature-dev-demo\target\test-classes;E:\Azure Workspace\feature-dev-demo\target\classes;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter\5.11.4\junit-jupiter-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.11.4\junit-jupiter-api-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\abhijitbo\.m2\repository\org\junit\platform\junit-platform-commons\1.11.4\junit-platform-commons-1.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.11.4\junit-jupiter-params-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.11.4\junit-jupiter-engine-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\junit\platform\junit-platform-engine\1.11.4\junit-platform-engine-1.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\mockito\mockito-junit-jupiter\5.14.2\mockito-junit-jupiter-5.14.2.jar;C:\Users\abhijitbo\.m2\repository\org\mockito\mockito-core\5.14.2\mockito-core-5.14.2.jar;C:\Users\abhijitbo\.m2\repository\net\bytebuddy\byte-buddy\1.15.4\byte-buddy-1.15.4.jar;C:\Users\abhijitbo\.m2\repository\net\bytebuddy\byte-buddy-agent\1.15.4\byte-buddy-agent-1.15.4.jar;C:\Users\abhijitbo\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Asia/Calcutta"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot\bin"/>
+    <property name="sun.java.command" value="C:\Users\abhijitbo\AppData\Local\Temp\surefire9279451727020977421\surefirebooter-20261028194059018_3.jar C:\Users\abhijitbo\AppData\Local\Temp\surefire9279451727020977421 2026-10-28T19-40-58_759-jvmRun1 surefire-20261028194059018_1tmp surefire_0-20261028194059018_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="E:\Azure Workspace\feature-dev-demo\target\test-classes;E:\Azure Workspace\feature-dev-demo\target\classes;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter\5.11.4\junit-jupiter-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.11.4\junit-jupiter-api-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\abhijitbo\.m2\repository\org\junit\platform\junit-platform-commons\1.11.4\junit-platform-commons-1.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.11.4\junit-jupiter-params-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.11.4\junit-jupiter-engine-5.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\junit\platform\junit-platform-engine\1.11.4\junit-platform-engine-1.11.4.jar;C:\Users\abhijitbo\.m2\repository\org\mockito\mockito-junit-jupiter\5.14.2\mockito-junit-jupiter-5.14.2.jar;C:\Users\abhijitbo\.m2\repository\org\mockito\mockito-core\5.14.2\mockito-core-5.14.2.jar;C:\Users\abhijitbo\.m2\repository\net\bytebuddy\byte-buddy\1.15.4\byte-buddy-1.15.4.jar;C:\Users\abhijitbo\.m2\repository\net\bytebuddy\byte-buddy-agent\1.15.4\byte-buddy-agent-1.15.4.jar;C:\Users\abhijitbo\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\abhijitbo"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-04-21"/>
+    <property name="java.home" value="C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="E:\Azure Workspace\feature-dev-demo"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\abhijitbo\AppData\Local\Temp\surefire9279451727020977421\surefirebooter-20261028194059018_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.11+10-LTS"/>
+    <property name="user.name" value="abhijitbo"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-21.0.11+10"/>
+    <property name="localRepository" value="C:\Users\abhijitbo\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\ABHIJI~1\AppData\Local\Temp\"/>
+    <property name="java.version" value="21.0.11"/>
+    <property name="user.dir" value="E:\Azure Workspace\feature-dev-demo"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\abhijitbo\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\abhijitbo\bin;C:\Ruby273-x64\bin;C:\Ruby32-x64\bin;C:\Ruby40-x64\bin;C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files (x86)\CheckPoint\Endpoint Security\Endpoint Common\bin;C:\Program Files\PyManager;C:\Program Files (x86)\Java\jdk1.8.0_171\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\dotnet;C:\Program Files\Go\bin;C:\Program Files\GitHub CLI;C:\Users\abhijitbo\AppData\Local\atx\bin;C:\Tools\apache-maven-3.9.6\bin;C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot\bin;C:\Users\abhijitbo\AppData\Local\Microsoft\WindowsApps;C:\Users\abhijitbo\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\abhijitbo\AppData\Local\Programs\Amazon\AWSCLIV2;C:\Users\abhijitbo\AppData\Roaming\npm;C:\Users\abhijitbo\AppData\Local\Programs\Podman;C:\Users\abhijitbo\.dotnet\tools;C:\Users\abhijitbo\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.NTS.8.5_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\Users\abhijitbo\go\bin;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="21.0.11+10-LTS"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="placeOrder_whenOrderHasNoItems_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="2.398">
+    <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\abhijitbo\.m2\repository\net\bytebuddy\byte-buddy-agent\1.15.4\byte-buddy-agent-1.15.4.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenOrderHasNoItems_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="0.039"/>
+  <testcase name="cancelOrder_whenOrderMissing_throwsOrderNotFoundException" classname="com.demo.orders.service.OrderServiceTest" time="0.008"/>
+  <testcase name="placeOrder_whenOrderHasItems_savesOrder" classname="com.demo.orders.service.OrderServiceTest" time="0.043">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService placeOrder
+INFO: Placing order ORD-1 for customer CUST-1
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenOrderIdIsNull_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="0.027"/>
+  <testcase name="getOrder_whenOrderMissing_throwsOrderNotFoundException" classname="com.demo.orders.service.OrderServiceTest" time="0.006"/>
+  <testcase name="checkout_whenCustomerIsNull_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="0.003"/>
+  <testcase name="getOrder_whenOrderExists_returnsOrder" classname="com.demo.orders.service.OrderServiceTest" time="0.004"/>
+  <testcase name="cancelOrder_whenOrderIdIsNull_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="0.005"/>
+  <testcase name="checkout_whenSubtotalIsZero_returnsZeroTotal" classname="com.demo.orders.service.OrderServiceTest" time="0.025">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 5.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="cancelOrder_whenReasonIsExactlyMaxLength_cancelsOrder" classname="com.demo.orders.service.OrderServiceTest" time="0.012">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService cancelOrder
+INFO: Cancelling order ORD-1 for customer CUST-1
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenGoldCustomerAndLargeOrder_capsAtFifteenPercent" classname="com.demo.orders.service.OrderServiceTest" time="0.014">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 15.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="placeOrder_whenOrderIsCancelled_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="0.012"/>
+  <testcase name="checkout_whenBelowThresholdAndStandard_appliesNoDiscount" classname="com.demo.orders.service.OrderServiceTest" time="0.005">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 0.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenOrderIsPlaced_appliesDiscountAsBefore" classname="com.demo.orders.service.OrderServiceTest" time="0.008">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 7.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenOrderIsCancelled_throwsIllegalStateException" classname="com.demo.orders.service.OrderServiceTest" time="0.005"/>
+  <testcase name="checkout_whenSilverCustomer_addsTwoPercentToVolume" classname="com.demo.orders.service.OrderServiceTest" time="0.008">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 7.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="cancelOrder_whenReasonIsNullOrBlank_throwsIllegalArgumentException(String)[1]" classname="com.demo.orders.service.OrderServiceTest" time="0.006"/>
+  <testcase name="cancelOrder_whenReasonIsNullOrBlank_throwsIllegalArgumentException(String)[2]" classname="com.demo.orders.service.OrderServiceTest" time="0.005"/>
+  <testcase name="cancelOrder_whenReasonIsNullOrBlank_throwsIllegalArgumentException(String)[3]" classname="com.demo.orders.service.OrderServiceTest" time="0.005"/>
+  <testcase name="cancelOrder_whenReasonIsNullOrBlank_throwsIllegalArgumentException(String)[4]" classname="com.demo.orders.service.OrderServiceTest" time="0.004"/>
+  <testcase name="calculateSubtotal_whenMultipleItems_returnsSumOfLineTotals" classname="com.demo.orders.service.OrderServiceTest" time="0.002"/>
+  <testcase name="placeOrder_whenNewOrder_storesStatusPlaced" classname="com.demo.orders.service.OrderServiceTest" time="0.006">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService placeOrder
+INFO: Placing order ORD-1 for customer CUST-1
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenGoldCustomerBelowVolumeThreshold_appliesLoyaltyOnly" classname="com.demo.orders.service.OrderServiceTest" time="0.005">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 5.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenCancelledOrderHasNoItems_throwsIllegalStateException" classname="com.demo.orders.service.OrderServiceTest" time="0.004"/>
+  <testcase name="cancelOrder_whenReasonTooLong_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="0.008"/>
+  <testcase name="cancelOrder_whenAlreadyCancelled_throwsIllegalStateException" classname="com.demo.orders.service.OrderServiceTest" time="0.012"/>
+  <testcase name="checkout_whenOrderIsCancelled_doesNotCallDiscountPolicy" classname="com.demo.orders.service.OrderServiceTest" time="0.047"/>
+  <testcase name="checkout_whenCustomPolicy_appliesPolicyPercent" classname="com.demo.orders.service.OrderServiceTest" time="0.013">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 15.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="calculateSubtotal_whenNoItems_returnsZero" classname="com.demo.orders.service.OrderServiceTest" time="0.006"/>
+  <testcase name="checkout_whenSubtotalJustBelow500_appliesFivePercentRoundedHalfUp" classname="com.demo.orders.service.OrderServiceTest" time="0.003">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 5.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenSubtotalExactly100_appliesFivePercent" classname="com.demo.orders.service.OrderServiceTest" time="0.004">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 5.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="placeOrder_whenOrderIsNull_throwsIllegalArgumentException" classname="com.demo.orders.service.OrderServiceTest" time="0.007"/>
+  <testcase name="checkout_whenOrderMissing_throwsOrderNotFoundException" classname="com.demo.orders.service.OrderServiceTest" time="0.003"/>
+  <testcase name="checkout_whenFractionalPrices_returnsAllValuesAtScaleTwo" classname="com.demo.orders.service.OrderServiceTest" time="0.009">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 5.00% discount
+]]></system-err>
+  </testcase>
+  <testcase name="cancelOrder_whenPlaced_savesCancelledOrderWithReasonAndClockTime" classname="com.demo.orders.service.OrderServiceTest" time="0.007">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService cancelOrder
+INFO: Cancelling order ORD-1 for customer CUST-1
+]]></system-err>
+  </testcase>
+  <testcase name="checkout_whenSubtotalExactly500_appliesTenPercent" classname="com.demo.orders.service.OrderServiceTest" time="0.026">
+    <system-err><![CDATA[Oct 28, 2026 7:41:03 PM com.demo.orders.service.OrderService checkout
+INFO: Checkout of order ORD-1 for customer CUST-1: 10.00% discount
+]]></system-err>
+  </testcase>
+</testsuite>
