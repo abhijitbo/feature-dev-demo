@@ -321,10 +321,11 @@ mkdir -p reports/unit_test_reports/<STORY-KEY>
 #### 7b — Run Tests
 
 **Java / Maven:**
+Run the full suite so regressions in existing tests are caught, then copy the Surefire XML reports
+(Surefire ignores `-Dsurefire.reportsDirectory` on the command line, so they always land in `target/`):
 ```bash
-mvn test -Dtest=<TestClassName> \
-  -Dsurefire.reportsDirectory=reports/unit_test_reports/<STORY-KEY> \
-  --no-transfer-progress
+mvn test --no-transfer-progress
+cp target/surefire-reports/TEST-*.xml reports/unit_test_reports/<STORY-KEY>/
 ```
 
 **Python / pytest:**
@@ -389,7 +390,7 @@ feat(<STORY-KEY>): <short description of the feature implemented>
 - Jira: <STORY-KEY>
 - Jira URL: <jira.url>/browse/<STORY-KEY>
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+Co-Authored-By: <name of the Claude model running this agent> <noreply@anthropic.com>
 ```
 
 Confirm:
@@ -485,7 +486,7 @@ feat(<STORY-KEY>): <Jira story summary>
 ## Next Step
 > Run `pr-review` skill with `<STORY-KEY>` for a structured code review before merging.
 
-🤖 Generated with Claude Sonnet 4.6 — AI Pair Programming Copilot
+🤖 Generated with [Claude Code](https://claude.com/claude-code) — AI Pair Programming Copilot
 ```
 
 Run:

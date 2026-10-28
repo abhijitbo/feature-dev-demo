@@ -1,6 +1,7 @@
 # Configuration for the feature-dev agent (.claude/commands/feature-dev.md).
 # Run with:  /feature-dev <STORY-KEY>   (key printed by create-demo-story.mjs)
 
+# ── Work tracking (Jira) ───────────────────────────────────────
 jira:
   # Must match the url returned by the MCP tool getAccessibleAtlassianResources
   # (the "jira" server in .mcp.json sets JIRA_URL to this value).
@@ -9,13 +10,110 @@ jira:
   project_key: DEMO
 
 confluence:
-  # No Confluence on this site yet — searches return "no pages found" and the agent continues with Jira only.
   space: DEMO
 
+# ── Azure DevOps (not used by this demo — work is tracked in Jira) ──
+# azure_devops:
+#   org_url: "https://dev.azure.com/prohcn/"   # used VERBATIM (dev.azure.com or <org>.visualstudio.com are aliases)
+#   project: "Crew"                            # CASE-SENSITIVE — exact ADO-URL casing, or the project GUID
+#   wiki: "Crew.wiki"
+#   review_state: "Code Review"                # state after PR; empty/absent = comment only, state unchanged
+#   token_env: AZURE_DEVOPS_TOKEN
+
+# ── Source control ─────────────────────────────────────────────
 github:
-  repo: abhijitbo/feature-dev-demo
+  repo: abhijitbo/feature-dev-demo           # GitHub owner/name
   base_branch: main
 
+# ── Build / language toolchain ─────────────────────────────────
+build:
+  package_manager: "auto"                    # auto | npm | pnpm | yarn   (JS/TS)
+
+# ── SQL ────────────────────────────────────────────────────────
+db:
+  test_harness: "none"                       # auto | tsqlt | none
+  connection: ""                             # NON-PROD DSN for validation/profiling; empty = static-only
+  profile: "off"                             # auto (on if connection set) | on | off
+
+# ── SAST ───────────────────────────────────────────────────────
 sonar:
-  # Leave empty to skip SAST (Step 7c).
-  space: ""
+  space: ""                                  # read by feature-dev.md Step 7c; empty = skip SAST
+  project_key: ""                            # empty = skip SAST
+  host_url: ""                               # required only if project_key set
+  scanner: "auto"                            # auto | dotnet | cli
+
+# ── Agent behavior ─────────────────────────────────────────────
+agent:
+  review_before_pr: true                     # pre-PR Code Review Gate (Step 9.5) | true | false
+  max_runtime_minutes: 30
+  max_build_fix_iterations: 5
+  capture_command_timing: true               # shell date around build/test/push
+  timing_report_dir: ".ai/reports/timing"
+
+  # ------------------------------------------------------------------------
+  # Model Routing (v9.9) — Claude primary, OpenAI fallback; ADVISORY.
+  # The skill ANNOUNCES the recommended tier+model per step; the host picker
+  # selects the active model. Escalation policy = Option 2 (L + XL + SQL + signals).
+  # Never bind a ⚠️ (deprecation-planned) model — see avoid_models.
+  # ------------------------------------------------------------------------
+  model_routing:
+    enabled: true
+    mode: "advisory"
+    default_vendor: "claude"            # claude primary; openai fallback
+    default_tier: "mid"
+
+    # Deprecation guard — never recommend a model on this list; use the vendor alt instead.
+    forbid_deprecated: true
+    avoid_models:
+      - "gpt-5.4-mini"                  # ⚠️ dep. 2026-10-19 — AVOID
+      - "gpt-5.3-codex"                 # ⚠️ — AVOID
+
+    # Tier → model mapping (all picks non-⚠️).
+    tiers:
+      cheap:
+        claude: "Claude Haiku 5.5"      # mechanical CLI/git steps
+        openai: "Gpt-6 Luna"
+      mid:
+        claude: "Claude Sonnet 5.5"     # comprehension/analysis, tests, build-fix, SQL scan, PR prose, review gate
+        openai: "Gpt-5.6 Terra"
+      premium:
+        claude: "Claude Opus 5.5"       # planning + implementation of L/XL or SQL or domain-signal work
+        openai: "Gpt-6.1 Sol"
+        openai_impl_alt: "Gpt-6 Astra"  # implementation alternative (non-⚠️)
+
+    # Escalate Mid → Premium when ANY hold (Option 2 = safety-first).
+    escalate_to_premium_when:
+      complexity: ["L", "XL"]           # L and XL both escalate
+      sql_in_scope: true                # any SQL / .sqlproj in scope escalates
+      signals: ["architecture", "FHIR", "EDI", "multi-system"]
+
+    # When the host CANNOT switch models mid-run, recommend ONE tier for the whole run.
+    # (The skill still recommends "premium" up front if the task is already L/XL/SQL/signal at the Plan Gate.)
+    single_model_fallback: "mid"
+
+    # Optional hard override — pins plan/impl tier regardless of the rubric (cheap|mid|premium).
+    # force_tier: "premium"
+
+    # Per-step tiers (single source of truth — no duplicate keys).
+    steps:
+      "P0-P10": cheap
+      "0": cheap                        # language detection
+      "1,1a,1.5": cheap                 # fetch work item + comments + parent
+      "2,2.5": cheap                    # wiki search · duplicate check
+      "3": mid                          # repo comprehension
+      "3.5": mid                        # complexity rubric
+      "plan_gate": mid                  # → premium if escalate_to_premium_when
+      "4": cheap                        # create branch
+      "5": mid                          # implementation → premium if escalate; impl-alt gpt-6-astra (NOT gpt-5.3-codex)
+      "6": mid                          # unit tests; cheap stub ok: gpt-6-luna (NOT gpt-5.4-mini)
+      "7": mid                          # build/test/fix; cheap trivial fix ok: gpt-6-luna (NOT gpt-5.4-mini)
+      "7_sql_scan": mid                 # SQL anti-pattern scan
+      "8": cheap                        # secrets · guards · commit · AB# verify
+      "9": cheap                        # push
+      "9.5": mid                        # code review gate (reads diff)
+      "10_pr_body": mid                 # PR summary PROSE = Sonnet (reviewer-facing)
+      "10_pr_create": cheap             # mechanical gh/az pr create
+      "10a": cheap                      # AB# title verify
+      "11": cheap                       # Jira comment + status transition
+      "12": cheap                       # save PR summary report (MD + HTML) · commit · push
+      "13": cheap                       # final summary table
