@@ -1,0 +1,20 @@
+# Configuration for the feature-dev agent (.claude/commands/feature-dev.md).
+# Run with:  /feature-dev DEMO-31
+
+jira:
+  # Must match the url returned by the MCP tool getAccessibleAtlassianResources
+  # (the "jira" server in .mcp.json sets JIRA_URL to this value).
+  url: https://demo-company.atlassian.net
+  project_key: DEMO
+
+confluence:
+  space: DEMO
+
+github:
+  # TODO: replace with a real repo you can push to, in owner/name format.
+  repo: your-github-org/feature-dev-demo
+  base_branch: main
+
+sonar:
+  # Leave empty to skip SAST (Step 7c).
+  space: ""

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "jira": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "E:/Azure Workspace/AIDLC/Feature-Application-Development/jira-mcp-server/src/index.js"
+      ],
+      "env": {
+        "JIRA_MODE": "mock",
+        "JIRA_URL": "https://demo-company.atlassian.net"
+      }
+    }
+  }
+}
