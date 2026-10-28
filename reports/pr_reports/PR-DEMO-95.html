@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PR Report — DEMO-95</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f5f7fa; }
+    .card { border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .card-header { background: #fff; font-weight: 600; }
+    code { color: #2b4c7e; }
+    .metric { font-size: 2rem; font-weight: 700; line-height: 1; }
+    td, th { vertical-align: middle; }
+  </style>
+</head>
+<body>
+<div class="container py-4" style="max-width: 1100px;">
+
+  <header class="mb-4">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <span class="badge text-bg-dark">DEMO-95</span>
+      <span class="badge text-bg-secondary">Story · Medium</span>
+      <span class="badge text-bg-primary">Jira: In Progress</span>
+      <span class="badge text-bg-success">✅ PR #1 open</span>
+    </div>
+    <h1 class="h3 mb-1">Apply tiered discount to order total at checkout</h1>
+    <p class="text-muted mb-0">
+      PR summary report · 2026-10-28 · Branch <code>feature/DEMO-95-apply-tiered-discount-to-order-total</code> ·
+      <a href="https://jira-team-1321.atlassian.net/browse/DEMO-95">Jira</a> ·
+      <a href="https://github.com/abhijitbo/feature-dev-demo/pull/1">Pull request #1</a>
+    </p>
+  </header>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric text-success">5/5</div><div class="text-muted small">ACs fulfilled</div></div></div>
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric text-success">38/38</div><div class="text-muted small">Tests passing</div></div></div>
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric">31</div><div class="text-muted small">New tests</div></div></div>
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric text-warning">—</div><div class="text-muted small">SAST not run</div></div></div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Story summary</div>
+    <div class="card-body">
+      <p>Apply an automatic discount at checkout based on order value and customer loyalty tier.</p>
+      <ul class="mb-2">
+        <li><strong>BR-1 Volume:</strong> &lt; 100.00 → 0% · 100.00–499.99 → 5% · ≥ 500.00 → 10%</li>
+        <li><strong>BR-2 Loyalty:</strong> STANDARD → 0% · SILVER → 2% · GOLD → 5%</li>
+        <li><strong>BR-3:</strong> volume + loyalty, capped at 15%</li>
+        <li><strong>BR-4:</strong> <code>BigDecimal</code>, HALF_UP, 2 decimal places</li>
+      </ul>
+      <p class="small text-muted mb-0">Confluence:
+        <a href="https://jira-team-1321.atlassian.net/wiki/spaces/DEMO/pages/15073281">PRD - E-commerce platform</a>
+        (§4.4 says the order summary itemizes subtotal and discount; it defines no discount rules).</p>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Acceptance criteria traceability</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>AC</th><th>Criterion</th><th>File</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>AC-01</td><td>Subtotal &lt; 100.00 + STANDARD → no discount, total = subtotal</td><td><code>TieredDiscountPolicy.java:54-62</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+          <tr><td>AC-02</td><td>Volume discount 5% (100.00–499.99) / 10% (≥ 500.00)</td><td><code>TieredDiscountPolicy.java:54-62</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+          <tr><td>AC-03</td><td>Loyalty % added to volume %, combined ≤ 15%</td><td><code>TieredDiscountPolicy.java:50-51, 64-70</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+          <tr><td>AC-04</td><td>CheckoutSummary values are BigDecimal, scale 2, HALF_UP</td><td><code>CheckoutSummary.java</code>, <code>OrderService.java:127-137</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+          <tr><td>AC-05</td><td>Null order id / null customer / empty order → IllegalArgumentException</td><td><code>OrderService.java:116-125</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Implementation</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>File</th><th>Change</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>discount/DiscountPolicy.java</code></td><td><span class="badge text-bg-info">New</span></td><td>Extension point for checkout discount rules</td></tr>
+          <tr><td><code>discount/TieredDiscountPolicy.java</code></td><td><span class="badge text-bg-info">New</span></td><td>BR-1 volume + BR-2 loyalty, BR-3 cap</td></tr>
+          <tr><td><code>model/Customer.java</code></td><td><span class="badge text-bg-info">New</span></td><td>Customer id + loyalty tier</td></tr>
+          <tr><td><code>model/CustomerTier.java</code></td><td><span class="badge text-bg-info">New</span></td><td>STANDARD / SILVER / GOLD</td></tr>
+          <tr><td><code>model/CheckoutSummary.java</code></td><td><span class="badge text-bg-info">New</span></td><td>Checkout result value object</td></tr>
+          <tr><td><code>service/OrderService.java:30-53</code></td><td><span class="badge text-bg-secondary">Modified</span></td><td>Policy injection; the 1-arg constructor defaults to TieredDiscountPolicy</td></tr>
+          <tr><td><code>service/OrderService.java:102-138</code></td><td><span class="badge text-bg-secondary">Modified</span></td><td><code>checkout(String orderId, Customer customer)</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Test results</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>Suite</th><th>Tests</th><th>Passed</th><th>Failed</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><code>TieredDiscountPolicyTest</code> (new)</td><td>17</td><td>17</td><td>0</td><td><span class="badge text-bg-success">✅ Passed</span></td></tr>
+          <tr><td><code>OrderServiceTest</code> (14 new + 7 existing)</td><td>21</td><td>21</td><td>0</td><td><span class="badge text-bg-success">✅ Passed</span></td></tr>
+          <tr class="fw-semibold"><td>Total</td><td>38</td><td>38</td><td>0</td><td><span class="badge text-bg-success">✅ Passed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-body small text-muted">Coverage per AC: happy path, boundaries (99.99 / 100.00 / 499.99 / 500.00), HALF_UP rounding, zero subtotal, cap, null and empty inputs. Details: <code>reports/unit_test_reports/DEMO-95/test-summary.md</code></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">SAST / quality gate</div>
+        <div class="card-body"><span class="badge text-bg-warning">⚠️ Skipped</span> SonarQube not run: <code>sonar.space</code> is not configured.</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">Jira update</div>
+        <div class="card-body">
+          <span class="badge text-bg-success">✅ Comment added</span>
+          <span class="badge text-bg-primary">To Do → In Progress</span>
+          <p class="small text-muted mt-2 mb-0">The workflow has no "In Review" status.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Commits &amp; notes for reviewers</div>
+    <div class="card-body">
+      <p><code>6201b6a</code> feat(DEMO-95): apply tiered volume + loyalty discount at checkout</p>
+      <ul class="mb-0">
+        <li><code>Customer</code> did not exist in the codebase, so a minimal record was added.</li>
+        <li>AC-05's "null order" is enforced as a null <code>orderId</code>, because <code>checkout</code> takes an id.</li>
+        <li>No check that <code>order.customerId()</code> matches <code>customer.id()</code>; a candidate follow-up story.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="text-muted small">Next step: run the <code>pr-review</code> skill with <code>DEMO-95</code>.</p>
+</div>
+</body>
+</html>
