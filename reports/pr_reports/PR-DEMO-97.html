@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PR Report — DEMO-97</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f5f7fa; }
+    .card { border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .card-header { background: #fff; font-weight: 600; }
+    code { color: #2b4c7e; }
+    .metric { font-size: 2rem; font-weight: 700; line-height: 1; }
+    td, th { vertical-align: middle; }
+  </style>
+</head>
+<body>
+<div class="container py-4" style="max-width: 1100px;">
+
+  <header class="mb-4">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <span class="badge text-bg-dark">DEMO-97</span>
+      <span class="badge text-bg-secondary">Story · Medium · Complexity S</span>
+      <span class="badge text-bg-primary">Jira: In Progress</span>
+      <span class="badge text-bg-success">✅ PR #3 open</span>
+    </div>
+    <h1 class="h3 mb-1">Block checkout of a cancelled order</h1>
+    <p class="text-muted mb-0">
+      PR summary report · 2026-10-28 · Branch <code>feature/DEMO-97-block-checkout-of-a-cancelled-order</code> ·
+      <a href="https://jira-team-1321.atlassian.net/browse/DEMO-97">Jira</a> ·
+      <a href="https://github.com/abhijitbo/feature-dev-demo/pull/3">Pull request #3</a>
+    </p>
+  </header>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric text-success">3/3</div><div class="text-muted small">ACs fulfilled</div></div></div>
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric text-success">60/60</div><div class="text-muted small">Tests passing</div></div></div>
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric">4</div><div class="text-muted small">New tests</div></div></div>
+    <div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="metric text-warning">—</div><div class="text-muted small">SAST not run</div></div></div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Story summary</div>
+    <div class="card-body">
+      <p><code>OrderService#checkout</code> must not price a cancelled order.</p>
+      <ul class="mb-2">
+        <li><strong>BR-1:</strong> only an order with status <code>PLACED</code> can be checked out</li>
+        <li><strong>BR-2:</strong> checkout of a <code>CANCELLED</code> order is rejected before any pricing or discount calculation runs</li>
+      </ul>
+      <p class="small text-muted mb-0">Out of scope: new order statuses, changes to cancellation (DEMO-96), refunds. Confluence: no pages found for this story.</p>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Acceptance criteria traceability</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>AC</th><th>Criterion</th><th>File</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>AC-01</td><td><code>CANCELLED</code> order → IllegalStateException naming id and status</td><td><code>OrderService.java:146-150</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+          <tr><td>AC-02</td><td><code>CANCELLED</code> order → DiscountPolicy not called</td><td><code>OrderService.java:146-150</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+          <tr><td>AC-03</td><td><code>PLACED</code> order → result unchanged (DEMO-95 tests pass)</td><td><code>OrderService.java:146-150</code></td><td><span class="badge text-bg-success">✅ Implemented</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Implementation</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>File</th><th>Change</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>service/OrderService.java:135</code></td><td><span class="badge text-bg-secondary">Modified</span></td><td>Javadoc <code>@throws IllegalStateException</code> on <code>checkout</code></td></tr>
+          <tr><td><code>service/OrderService.java:146-150</code></td><td><span class="badge text-bg-secondary">Modified</span></td><td>Status guard after <code>getOrder</code>, before the empty-items check and pricing</td></tr>
+          <tr><td><code>test/.../OrderServiceTest.java:62</code></td><td><span class="badge text-bg-secondary">Modified</span></td><td>DEMO-97 block in class Javadoc; imports for <code>DiscountPolicy</code> and <code>Mockito.mock</code></td></tr>
+          <tr><td><code>test/.../OrderServiceTest.java:365-408</code></td><td><span class="badge text-bg-secondary">Modified</span></td><td>4 tests added</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Code documentation added</div>
+    <div class="card-body small">
+      <ul class="mb-0">
+        <li><code>OrderService.java</code> · Javadoc: <code>@throws IllegalStateException</code> on <code>checkout</code> (line 135)</li>
+        <li><code>OrderService.java</code> · Inline: comment on the status guard (line 146) explaining BR-1 and BR-2</li>
+        <li><code>OrderServiceTest.java</code> · Javadoc: DEMO-97 block in the class Javadoc (line 62)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Test results</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>Suite</th><th>Tests</th><th>Passed</th><th>Failed</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><code>OrderServiceTest</code> (4 new + 33 existing)</td><td>37</td><td>37</td><td>0</td><td><span class="badge text-bg-success">✅ Passed</span></td></tr>
+          <tr><td><code>OrderTest</code> (regression)</td><td>6</td><td>6</td><td>0</td><td><span class="badge text-bg-success">✅ Passed</span></td></tr>
+          <tr><td><code>TieredDiscountPolicyTest</code> (regression)</td><td>17</td><td>17</td><td>0</td><td><span class="badge text-bg-success">✅ Passed</span></td></tr>
+          <tr class="fw-semibold"><td>Total</td><td>60</td><td>60</td><td>0</td><td><span class="badge text-bg-success">✅ Passed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-body small text-muted">Coverage: cancelled order with items and with no items (status check runs first), DiscountPolicy not invoked, placed order unchanged. Details: <code>reports/unit_test_reports/DEMO-97/test-summary.md</code></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">SAST / quality gate</div>
+        <div class="card-body"><span class="badge text-bg-warning">⚠️ Skipped</span> SonarQube not run: <code>sonar.space</code> is not configured.</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">Jira update</div>
+        <div class="card-body">
+          <span class="badge text-bg-success">✅ Comment added (201)</span>
+          <span class="badge text-bg-primary">To Do → In Progress (204)</span>
+          <p class="small text-muted mt-2 mb-0">The workflow has no "In Review" or "Code Review" status. "Done" was not selected.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Review gate (Step 9.5)</div>
+    <div class="card-body">
+      <p class="mb-2"><span class="badge text-bg-success">✅ Passed</span> No Critical or High findings. 0 fix rounds.</p>
+      <p class="small mb-1 fw-semibold">Low notes</p>
+      <ul class="mb-0">
+        <li>The <code>checkout</code> Javadoc keeps <code>@since DEMO-95</code>. The new exception is documented via <code>@throws</code> only (repo convention: one <code>@since</code> per member).</li>
+        <li>The AC-02 test uses a Mockito mock of <code>DiscountPolicy</code>, while the other checkout tests use the real <code>TieredDiscountPolicy</code>. This is deliberate, so the test can verify no interaction.</li>
+        <li>The guard is <code>status != PLACED</code>, so any status added later is blocked at checkout by default (safe, per BR-1).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Commits &amp; notes for reviewers</div>
+    <div class="card-body">
+      <p><code>69b4a93</code> feat(DEMO-97): block checkout of a cancelled order (plus the docs commit that adds this report)</p>
+      <ul class="mb-0">
+        <li>The status check runs before the empty-items check, so a cancelled order with no items reports the status error.</li>
+        <li>Only <code>checkout</code> changed in production code. <code>cancelOrder</code> and <code>placeOrder</code> from DEMO-96 are untouched.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">Model usage</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>Group</th><th>Steps</th><th>Tier</th><th>Model</th><th>Escalated</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>—</td><td>orchestrator</td><td>session</td><td>Claude Opus 5.5 (session not started with <code>/model sonnet</code>)</td><td>—</td><td>—</td></tr>
+          <tr><td>G1</td><td>P1–P7, 0, 1, 2</td><td>cheap</td><td>Claude Haiku 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G2</td><td>3, 3.5</td><td>mid</td><td>Claude Sonnet 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G3</td><td>plan_gate (5a)</td><td>mid</td><td>Claude Sonnet 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G4</td><td>4</td><td>cheap</td><td>Claude Haiku 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G5</td><td>5</td><td>mid</td><td>Claude Sonnet 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G6</td><td>6, 7 (7_sql_scan skipped: no SQL)</td><td>mid</td><td>Claude Sonnet 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G7</td><td>8, 9</td><td>cheap</td><td>Claude Haiku 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G8</td><td>9.5</td><td>mid</td><td>Claude Sonnet 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G9</td><td>10_pr_body</td><td>mid</td><td>Claude Sonnet 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G10</td><td>10_pr_create, 11, 12</td><td>cheap</td><td>Claude Haiku 5.5</td><td>no</td><td>ok</td></tr>
+          <tr><td>G11</td><td>13</td><td>cheap</td><td>Claude Haiku 5.5</td><td>no</td><td>runs after this report</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-body small text-muted">Complexity S, no SQL, no signals → no escalation to premium. <code>10a</code> (Azure DevOps AB# check) not applicable.</div>
+  </div>
+
+  <p class="text-muted small">Next step: run the <code>pr-review</code> skill with <code>DEMO-97</code>.</p>
+</div>
+</body>
+</html>
