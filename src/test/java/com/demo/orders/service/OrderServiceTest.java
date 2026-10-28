@@ -1,19 +1,27 @@
 package com.demo.orders.service;
 
+import com.demo.orders.discount.TieredDiscountPolicy;
 import com.demo.orders.exception.OrderNotFoundException;
 import com.demo.orders.model.CheckoutSummary;
 import com.demo.orders.model.Customer;
 import com.demo.orders.model.CustomerTier;
 import com.demo.orders.model.Order;
 import com.demo.orders.model.OrderItem;
+import com.demo.orders.model.OrderStatus;
 import com.demo.orders.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -37,9 +46,21 @@ import static org.mockito.Mockito.when;
  * - AC-03: loyalty percentage added to volume percentage, capped at 15%
  * - AC-04: summary values are BigDecimal at scale 2, HALF_UP
  * - AC-05: null order id, null customer or empty order → IllegalArgumentException
+ *
+ * <p>Placement-status and cancellation tests cover Jira story DEMO-96:
+ * Allow customers to cancel a placed order with a reason.</p>
+ *
+ * Acceptance criteria tested:
+ * - AC-01: a placed order is stored with status PLACED
+ * - AC-02: cancelOrder stores status CANCELLED, the reason and the clock's instant
+ * - AC-03: cancelling an already CANCELLED order → IllegalStateException, not saved again
+ * - AC-04: unknown order id → OrderNotFoundException
+ * - AC-05: null order id, null/blank reason or reason over 255 characters → IllegalArgumentException
  */
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
+
+    private static final Instant NOW = Instant.parse("2026-10-28T10:15:30Z");
 
     @Mock
     private OrderRepository orderRepository;
@@ -48,7 +69,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(orderRepository);
+        orderService = new OrderService(orderRepository, new TieredDiscountPolicy(), Clock.fixed(NOW, ZoneOffset.UTC));
     }
 
     private static Order orderWith(OrderItem... items) {
@@ -77,6 +98,103 @@ class OrderServiceTest {
     @Test
     void placeOrder_whenOrderIsNull_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> orderService.placeOrder(null));
+    }
+
+    // DEMO-96 AC-01
+
+    @Test
+    void placeOrder_whenNewOrder_storesStatusPlaced() {
+        Order order = orderWith(new OrderItem("P-1", new BigDecimal("10.00"), 1));
+        when(orderRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        assertEquals(OrderStatus.PLACED, orderService.placeOrder(order).status());
+    }
+
+    @Test
+    void placeOrder_whenOrderIsCancelled_throwsIllegalArgumentException() {
+        Order cancelled = orderWith(new OrderItem("P-1", BigDecimal.ONE, 1)).cancel("duplicate", NOW);
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.placeOrder(cancelled));
+        verify(orderRepository, never()).save(any());
+    }
+
+    // DEMO-96 AC-02
+
+    @Test
+    void cancelOrder_whenPlaced_savesCancelledOrderWithReasonAndClockTime() {
+        Order placed = orderWith(new OrderItem("P-1", new BigDecimal("10.00"), 2));
+        when(orderRepository.findById("ORD-1")).thenReturn(Optional.of(placed));
+        when(orderRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Order cancelled = orderService.cancelOrder("ORD-1", "Ordered by mistake");
+
+        Order expected = new Order("ORD-1", "CUST-1", placed.items(), OrderStatus.CANCELLED, "Ordered by mistake", NOW);
+        assertEquals(expected, cancelled);
+        verify(orderRepository).save(expected);
+    }
+
+    @Test
+    void cancelOrder_whenReasonIsExactlyMaxLength_cancelsOrder() {
+        String reason = "x".repeat(OrderService.MAX_CANCELLATION_REASON_LENGTH);
+        when(orderRepository.findById("ORD-1"))
+                .thenReturn(Optional.of(orderWith(new OrderItem("P-1", BigDecimal.ONE, 1))));
+        when(orderRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        assertEquals(reason, orderService.cancelOrder("ORD-1", reason).cancellationReason());
+    }
+
+    // DEMO-96 AC-03
+
+    @Test
+    void cancelOrder_whenAlreadyCancelled_throwsIllegalStateException() {
+        Order cancelled = orderWith(new OrderItem("P-1", BigDecimal.ONE, 1)).cancel("first", NOW);
+        when(orderRepository.findById("ORD-1")).thenReturn(Optional.of(cancelled));
+
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> orderService.cancelOrder("ORD-1", "second"));
+        assertTrue(e.getMessage().contains("ORD-1"));
+        assertTrue(e.getMessage().contains("CANCELLED"));
+        verify(orderRepository, never()).save(any());
+    }
+
+    // DEMO-96 AC-04
+
+    @Test
+    void cancelOrder_whenOrderMissing_throwsOrderNotFoundException() {
+        when(orderRepository.findById("ORD-404")).thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class, () -> orderService.cancelOrder("ORD-404", "no longer needed"));
+        verify(orderRepository, never()).save(any());
+    }
+
+    // DEMO-96 AC-05
+
+    @Test
+    void cancelOrder_whenOrderIdIsNull_throwsIllegalArgumentException() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> orderService.cancelOrder(null, "no longer needed"));
+        assertTrue(e.getMessage().contains("orderId"));
+        verifyNoInteractions(orderRepository);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t\n"})
+    void cancelOrder_whenReasonIsNullOrBlank_throwsIllegalArgumentException(String reason) {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> orderService.cancelOrder("ORD-1", reason));
+        assertTrue(e.getMessage().contains("reason"));
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void cancelOrder_whenReasonTooLong_throwsIllegalArgumentException() {
+        String reason = "x".repeat(OrderService.MAX_CANCELLATION_REASON_LENGTH + 1);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> orderService.cancelOrder("ORD-1", reason));
+        assertTrue(e.getMessage().contains("255"));
+        verifyNoInteractions(orderRepository);
     }
 
     @Test
