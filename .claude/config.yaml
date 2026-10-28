@@ -6,11 +6,11 @@ jira:
   # (the "jira" server in .mcp.json sets JIRA_URL to this value).
   url: https://jira-team-1321.atlassian.net
   # Overwritten by: node scripts/create-demo-story.mjs --config <this file>
-  project_key: KAN
+  project_key: DEMO
 
 confluence:
   # No Confluence on this site yet — searches return "no pages found" and the agent continues with Jira only.
-  space: KAN
+  space: DEMO
 
 github:
   repo: abhijitbo/feature-dev-demo
