@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-28
 **Branch:** feature/DEMO-95-apply-tiered-discount-to-order-total
-**PR URL:** ⚠️ Not created. Automated PR creation failed (HTTP 403: the GitHub token lacks pull-request write permission). Open it manually from the [compare view](https://github.com/abhijitbo/feature-dev-demo/compare/main...feature/DEMO-95-apply-tiered-discount-to-order-total?expand=1) and paste the prepared body from `reports/pr_reports/PR-DEMO-95-body.md`.
+**PR URL:** https://github.com/abhijitbo/feature-dev-demo/pull/1
 **Jira Story:** DEMO-95 — Apply tiered discount to order total at checkout
 **Jira URL:** https://jira-team-1321.atlassian.net/browse/DEMO-95
 
@@ -88,10 +88,10 @@ Apply an automatic discount at checkout based on order value (volume: 0% / 5% / 
 - **Title:** feat(DEMO-95): Apply tiered discount to order total at checkout
 - **Base Branch:** main
 - **Head Branch:** feature/DEMO-95-apply-tiered-discount-to-order-total
-- **URL:** ⚠️ Not created (HTTP 403, token permission). Prepared body: `reports/pr_reports/PR-DEMO-95-body.md`
+- **URL:** https://github.com/abhijitbo/feature-dev-demo/pull/1
 
 ## Jira Update
-- Comment added: Yes, with the branch, commit, test results and compare link
+- Comment added: Yes, two comments. The first covers the implementation; the second has the PR link.
 - Status transitioned to: In Progress. The workflow has no "In Review" status (only To Do / In Progress / Done).
 
 ## Notes for Reviewers
@@ -100,5 +100,4 @@ Apply an automatic discount at checkout based on order value (volume: 0% / 5% / 
 - `checkout` does not check that `order.customerId()` matches `customer.id()`. No AC requires this; it would make a good follow-up story.
 
 ## Next Step
-1. Create the PR manually, or grant the token **Pull requests: Read and write** and re-run PR creation.
-2. Run the `pr-review` skill with `DEMO-95` for a structured code review before merging.
+Run the `pr-review` skill with `DEMO-95` for a structured code review before merging.
