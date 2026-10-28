@@ -7,8 +7,20 @@
         "E:/Azure Workspace/AIDLC/Feature-Application-Development/jira-mcp-server/src/index.js"
       ],
       "env": {
-        "JIRA_MODE": "mock",
-        "JIRA_URL": "https://demo-company.atlassian.net"
+        "JIRA_MODE": "live",
+        "JIRA_URL": "https://jira-team-1321.atlassian.net",
+        "JIRA_EMAIL": "${JIRA_EMAIL:-abhijitbo@cybage.com}",
+        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}"
+      }
+    },
+    "github": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "E:/Azure Workspace/AIDLC/Feature-Application-Development/github-mcp-server/src/index.js"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
       }
     }
   }

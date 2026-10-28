@@ -48,8 +48,8 @@ Verify all conditions before writing any code. Stop if a critical check fails.
 | P3 | Story type is `Story` (not Epic/Bug/Task) | Warn if different type; confirm before proceeding |
 | P4 | Story has label `story-review-passed` OR review score ≥ 16/25 in description | Warn: "Story has not passed Review & Refine. Implementation may have misalignment risk." |
 | P5 | Story status is `To Do` or `In Progress` (not Done/Cancelled) | Stop: "Story is [status]. Cannot implement a closed story." |
-| P6 | GitHub repo accessible — `gh auth status` succeeds | Stop: "GitHub CLI not authenticated. Run `gh auth login` first." |
-| P7 | Feature branch `feature/<branch-name>` does not already exist remotely | If exists: confirm whether to reuse or create a new branch |
+| P6 | GitHub repo accessible — `gh auth status` succeeds, **or** (if `gh` is not installed) GitHub MCP `getAuthenticatedUser` succeeds and `getRepository` returns `github.repo` | Stop: "GitHub not authenticated. Run `gh auth login` or set GITHUB_TOKEN for the github MCP server." |
+| P7 | Feature branch `feature/<branch-name>` does not already exist remotely (`git ls-remote --heads origin <branch>` or GitHub MCP `branchExists`) | If exists: confirm whether to reuse or create a new branch |
 
 ---
 
@@ -420,6 +420,10 @@ Verify GitHub CLI:
 gh --version && gh auth status
 ```
 
+If `gh` is not installed, use the GitHub MCP server instead: call `createPullRequest` with
+`owner`/`repo` from `github.repo`, the title and body below, `head: feature/<branch-name>` and
+`base: <github.base_branch>`. Use the returned `url` as the PR URL in later steps.
+
 **PR Title:**
 ```
 feat(<STORY-KEY>): <Jira story summary>
@@ -632,7 +636,7 @@ Print a final summary table:
 | Config key missing | Stop; list missing keys |
 | Jira Story not found | Stop: "Story [$ARGUMENTS] not found. Check the story key." |
 | Story is Done/Cancelled | Stop: "Cannot implement a [status] story." |
-| GitHub CLI not authenticated | Stop: "Run `gh auth login` then retry." |
+| GitHub CLI not authenticated and GitHub MCP unavailable | Stop: "Run `gh auth login` or set GITHUB_TOKEN, then retry." |
 | Feature branch already exists | Warn; confirm reuse or new branch with user |
 | Confluence search returns no results | Note in report; proceed with Jira context only |
 | Build/test tool not found | Note in report; write test file; skip test execution step |
