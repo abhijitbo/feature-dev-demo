@@ -132,6 +132,7 @@ public class OrderService {
      * @return subtotal, discount percentage, discount amount and total payable
      * @throws IllegalArgumentException if {@code orderId} or {@code customer} is null, or the order has no items
      * @throws OrderNotFoundException   if no order exists with that id
+     * @throws IllegalStateException    if the order is not {@link OrderStatus#PLACED}
      * @since DEMO-95
      */
     public CheckoutSummary checkout(String orderId, Customer customer) {
@@ -142,6 +143,11 @@ public class OrderService {
             throw new IllegalArgumentException("customer must not be null");
         }
         Order order = getOrder(orderId);
+        // DEMO-97: reject non-PLACED orders before any pricing or discount calculation runs (BR-1, BR-2).
+        if (order.status() != OrderStatus.PLACED) {
+            throw new IllegalStateException(
+                    "order " + orderId + " cannot be checked out because its status is " + order.status());
+        }
         if (order.items().isEmpty()) {
             throw new IllegalArgumentException("order " + orderId + " must contain at least one item");
         }
